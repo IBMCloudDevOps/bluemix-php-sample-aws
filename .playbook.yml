@@ -1,0 +1,73 @@
+# Publish this application to bluemix using ansible
+---
+- name: Publish the app to AWS
+  hosts: localhost
+  connection: local
+  vars:
+    pipeline_id: "{{ lookup('env','PIPELINE_ID') | default('bluemix-php-sample',true) }}"
+    app_name: "{{ lookup('env','APP_NAME') | default(pipeline_id,true) }}"
+    s3_bucket: "{{ lookup('env', 'S3_BUCKET') | default(app_name,true) }}"
+    region: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('us-west-2', true) }}"
+    solution_stack_name: "64bit Amazon Linux 2016.09 v2.3.1 running PHP 5.5"
+
+  tasks:
+    # Store datetime for version info
+    - name: Create version string
+      set_fact:
+        version: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S%Z')  }}"
+
+    # Create information for archive zip
+    - name: Create zip information
+      set_fact:
+        zip_filename: "{{ app_name }}_{{ version }}.zip"
+        zip_dir: "{{ lookup('env', 'PWD') }}/s3"
+
+    # Create a directory for the archive
+    - name: Create Directory
+      file:
+        path: "{{ zip_dir }}"
+        state: directory
+
+    # Create a zip archive (elasticbeanstalk only supports zips and jars currently)
+    - name: Create zip archive
+      shell: "zip -r {{ zip_dir }}/{{ zip_filename }} . -x s3\\* .bluemix\\* .git\\* ansible-elastic-beanstalk\\* setup_tools\\* .playbook.* .gitignore .cfignore .tarignore _*.sh manifest.yml README.md"
+
+    # ansible s3 docs: http://docs.ansible.com/ansible/s3_module.html
+    # you can enable versioning in bucket, set the zip_filename: {{ app_name }}.zip and use version: {{ version }}
+    - name: push to s3
+      s3:
+        mode: put
+        region: "{{ region }}"
+        bucket: "{{ s3_bucket }}"
+        src: "{{ zip_dir }}/{{ zip_filename }}"
+        object: "{{ zip_filename }}"
+
+    # ansible elastic beanstalk: https://github.com/hsingh/ansible-elastic-beanstalk
+    # Create beanstalk app
+    - name: Create Elastic Beanstalk application
+      elasticbeanstalk_app:
+        region: "{{ region }}"
+        app_name: "{{ app_name }}"
+        state: present
+      register: app_output
+
+    # Connect to s3 bucket version
+    - name: Link uploaded version
+      elasticbeanstalk_version:
+        region: "{{ region }}"
+        app_name: "{{ app_name }}"
+        version_label: "{{ version }}"
+        s3_bucket: "{{ s3_bucket  }}"
+        s3_key: "{{zip_filename}}"
+        state: present
+      register: version_output
+
+    # Create the environment
+    - name: Create app env
+      elasticbeanstalk_env:
+        region: "{{ region }}"
+        app_name: "{{ app_name }}"
+        env_name: "{{ app_name }}-env"
+        version_label: "{{ version }}"
+        solution_stack_name: "{{ solution_stack_name }}"
+      register: env_output
