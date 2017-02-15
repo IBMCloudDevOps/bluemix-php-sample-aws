@@ -11,6 +11,9 @@
     solution_stack_name: "64bit Amazon Linux 2016.09 v2.3.1 running PHP 5.5"
 
   tasks:
+    # ------------------------------------------------------------
+    # Set Facts
+    # ---
     # Store datetime for version info
     - name: Create version string
       set_fact:
@@ -22,6 +25,15 @@
         zip_filename: "{{ app_name }}_{{ version }}.zip"
         zip_dir: "{{ lookup('env', 'PWD') }}/s3"
 
+    # ------------------------------------------------------------
+    # Bluemix Deploy
+    # ---
+    - name: CF Push Application
+      shell: "cf push -f manifest.yml -u none --hostname {{ app_name }}"
+
+    # ------------------------------------------------------------
+    # AWS Deploy
+    # ---
     # Create a directory for the archive
     - name: Create Directory
       file:
@@ -42,7 +54,7 @@
         src: "{{ zip_dir }}/{{ zip_filename }}"
         object: "{{ zip_filename }}"
 
-    # ansible elastic beanstalk: https://github.com/IBMCloudDevOps/ansible-elastic-beanstalk
+    # ansible elastic beanstalk: https://github.com/hsingh/ansible-elastic-beanstalk
     # Create beanstalk app
     - name: Create Elastic Beanstalk application
       elasticbeanstalk_app:
@@ -71,3 +83,4 @@
         version_label: "{{ version }}"
         solution_stack_name: "{{ solution_stack_name }}"
       register: env_output
+    # ------------------------------------------------------------

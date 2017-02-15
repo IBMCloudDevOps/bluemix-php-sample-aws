@@ -13,5 +13,5 @@ echo "apt-get -qq clean"
 sudo apt-get -qq clean
 
 #Install required library
-echo "git clone -b release-1.0 https://github.com/jcantosz/ansible-elastic-beanstalk"
-git clone -b release-1.0 https://github.com/jcantosz/ansible-elastic-beanstalk
+echo "git clone -b release-1.0 https://github.com/IBMCloudDevOps/ansible-elastic-beanstalk"
+git clone -b release-1.0 https://github.com/IBMCloudDevOps/ansible-elastic-beanstalk
