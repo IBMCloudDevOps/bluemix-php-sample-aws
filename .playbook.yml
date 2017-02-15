@@ -42,7 +42,7 @@
         src: "{{ zip_dir }}/{{ zip_filename }}"
         object: "{{ zip_filename }}"
 
-    # ansible elastic beanstalk: https://github.com/hsingh/ansible-elastic-beanstalk
+    # ansible elastic beanstalk: https://github.com/IBMCloudDevOps/ansible-elastic-beanstalk
     # Create beanstalk app
     - name: Create Elastic Beanstalk application
       elasticbeanstalk_app:
