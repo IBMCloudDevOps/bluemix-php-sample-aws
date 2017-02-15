@@ -1,5 +1,5 @@
 # Bluemix PHP App Sample
-The application repo that accompanies the recipe: [Something]()
+The application repo that accompanies the recipe: [Deploying to AWS from Bluemix?!](https://developer.ibm.com/recipes/tutorials/deploying-to-aws-from-bluemix/)
 
 ## PHP Starter Overview
 
