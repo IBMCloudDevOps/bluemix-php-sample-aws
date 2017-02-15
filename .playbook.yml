@@ -4,7 +4,7 @@
   hosts: localhost
   connection: local
   vars:
-    app_name: "{{ lookup('env','APP_NAME')"
+    app_name: "{{ lookup('env','APP_NAME') }}"
     s3_bucket: "{{ lookup('env', 'S3_BUCKET') | default(app_name,true) }}"
     region: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('us-west-2', true) }}"
     solution_stack_name: "64bit Amazon Linux 2016.09 v2.3.1 running PHP 5.5"
