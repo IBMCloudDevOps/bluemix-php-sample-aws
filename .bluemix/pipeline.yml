@@ -29,7 +29,7 @@ stages:
       echo
       echo "Lint the PHP source"
       php -l *.php
-- name: Ansible Deploy
+- name: Deploy Prod(Bluemix) & Prod(AWS)
   inputs:
   - type: job
     stage: Build
