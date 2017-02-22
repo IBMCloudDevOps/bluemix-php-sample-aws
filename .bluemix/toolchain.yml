@@ -1,5 +1,4 @@
 ---
-default_locale: en
 name: "Ansible deploy to AWS"
 description: "Toolchain to deploy this application to AWS using Ansible"
 version: 0.1
